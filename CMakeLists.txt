@@ -25,14 +25,17 @@ find_package(Boost REQUIRED)
 
 set(tigerfmm_source_files
 	src/main.cpp
+	src/tree.cpp
 )
 
 set(tigerfmm_header_files
 	tigerfmm/defs.hpp  
 	tigerfmm/expansion.hpp  
 	tigerfmm/multipole.hpp	
+	tigerfmm/particle.hpp	
 	tigerfmm/real.hpp  
 	tigerfmm/simd.hpp
+	tigerfmm/tree.hpp
 )
 
 

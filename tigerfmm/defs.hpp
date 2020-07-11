@@ -45,4 +45,9 @@ constexpr integer MP = 7;
 template<class T>
 using space_vector = std::array<T,3>;
 
+constexpr real zero = real(0.0);
+constexpr real one = real(1.0);
+constexpr real two = real(2.0);
+
+
 #endif /* DEFS_H_ */
