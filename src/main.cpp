@@ -33,6 +33,7 @@
 #include <list>
 #include <vector>
 
+#include <fenv.h>
 
 
 
@@ -51,12 +52,26 @@ int main(int argc, char *argv[]) {
 
 int hpx_main(int argc, char *argv[]) {
 
+
+	feenableexcept(FE_DIVBYZERO);
+	feenableexcept(FE_INVALID);
+	feenableexcept(FE_OVERFLOW);
+
+
+	bool found_analytic;
 	printf("%16s %16s %16s %16s %16s %16s %16s %16s %16s\n", "theta", "nparts",
 			"solve_time", "err", "err99", "terr", "terr99", "gsum", "tsum");
 	tree root;
 //	srand(time(NULL));
 	root.initialize();
 	root.output("output.txt");
+	if( root.load_analytic() ) {
+		printf( "Found analytic.bin\n");
+		found_analytic = true;
+	} else {
+		printf( "Did not find analytic.bin, computing\n");
+		found_analytic = false;
+	}
 	for (real theta = one; theta > 0.15; theta -= 0.1) {
 		root.set_theta(theta);
 		space_vector<real> g_err;
@@ -101,7 +116,9 @@ int hpx_main(int argc, char *argv[]) {
 				this_err, err99, this_err_torque, err99_torque, gsum, tsum);
 		fclose(fp);
 	}
-
+	if( !found_analytic ) {
+		root.save_analytic();
+	}
 	return hpx::finalize();
 }
 

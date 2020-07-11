@@ -5,24 +5,18 @@
 #include <unistd.h>
 #include <set>
 
-
-
 static integer ncells = 0;
 static bool analytic_computed = false;
 static std::multiset<real> top10;
 static real theta = 1.0;
 
-void tree::set_theta( real t ) {
+void tree::set_theta(real t) {
 	theta = t;
 }
-
-
 
 real tree::get_top10() {
 	return *(top10.begin());
 }
-
-
 
 real lane_emden(real n, real rho0, real r0, real r) {
 	real m3 = zero, menc = zero;
@@ -30,10 +24,10 @@ real lane_emden(real n, real rho0, real r0, real r) {
 		return z;
 	};
 	const auto dz_dx = [n](real x, real y, real z) {
-		if( x > zero ) {
-			return -(real(two) * z / x + std::pow(std::max(y,zero),n));
+		if (x > zero) {
+			return -(real(two) * z / x + std::pow(std::max(y, zero), n));
 		} else {
-			return -std::pow(std::max(y,zero),n);
+			return -std::pow(std::max(y, zero), n);
 		}
 	};
 
@@ -64,7 +58,6 @@ real lane_emden(real n, real rho0, real r0, real r) {
 	}
 }
 
-
 tree::tree() {
 	ncells++;
 }
@@ -87,7 +80,7 @@ bool tree::operator<(const tree &other) {
 }
 
 space_vector<real> tree::force_sum(bool norm) const {
-	space_vector < real > sum;
+	space_vector<real> sum;
 	for (integer d = 0; d != NDIM; ++d) {
 		sum[d] = zero;
 	}
@@ -113,7 +106,7 @@ space_vector<real> tree::force_sum(bool norm) const {
 }
 
 space_vector<real> tree::torque_sum(const bool norm) const {
-	space_vector < real > sum;
+	space_vector<real> sum;
 	for (integer d = 0; d != NDIM; ++d) {
 		sum[d] = zero;
 	}
@@ -162,7 +155,7 @@ bool tree::is_well_separated_from(const tree &other) const {
 }
 
 void tree::compute_expansions(const expansion<real> &Lphi0, const space_vector<real> &X0) {
-	space_vector < real > dX;
+	space_vector<real> dX;
 	for (integer i = 0; i != NDIM; ++i) {
 		dX[i] = Xcom[i] - X0[i];
 	}
@@ -204,8 +197,8 @@ void tree::compute_interactions(std::vector<tree*> cells) {
 	child_cells.resize(0);
 	auto l = cells.begin();
 
-	multipole < simd_vector > Mvec;
-	space_vector < simd_vector > Rvec;
+	multipole<simd_vector> Mvec;
+	space_vector<simd_vector> Rvec;
 
 	int index = 0;
 
@@ -220,7 +213,7 @@ void tree::compute_interactions(std::vector<tree*> cells) {
 				}
 				++index;
 				if (index == simd_len) {
-					expansion < simd_vector > Lvec;
+					expansion<simd_vector> Lvec;
 					for (integer l = 0; l != LP; ++l) {
 						Lvec[l] = 0.0;
 					}
@@ -259,7 +252,7 @@ void tree::compute_interactions(std::vector<tree*> cells) {
 				Mvec[l][index] = 0.0;
 			}
 		}
-		expansion < simd_vector > Lvec;
+		expansion<simd_vector> Lvec;
 		for (integer l = 0; l != LP; ++l) {
 			Lvec[l] = 0.0;
 		}
@@ -344,8 +337,8 @@ void tree::P2P(tree *other) {
 }
 
 void tree::P2Pself(const tree *other) {
-	expansion < real > D;
-	space_vector < real > dX;
+	expansion<real> D;
+	space_vector<real> dX;
 	real r2, r3inv, rinv;
 	for (auto n = particles.begin(); n != particles.end(); ++n) {
 		auto m = n;
@@ -417,10 +410,10 @@ void tree::compute_multipoles() {
 	if (is_leaf) {
 		rmax_ben = 0.0;
 		for (auto l = particles.begin(); l != particles.end(); ++l) {
-			multipole < real > this_M;
+			multipole<real> this_M;
 			this_M = 0.0;
 			this_M() = l->M;
-			space_vector < real > dX;
+			space_vector<real> dX;
 			for (integer i = 0; i != NDIM; ++i) {
 				dX[i] = l->X[i] - Xcom[i];
 			}
@@ -436,7 +429,7 @@ void tree::compute_multipoles() {
 	} else {
 		for (integer l = 0; l != nchild; ++l) {
 			auto &c = children[l];
-			space_vector < real > dX;
+			space_vector<real> dX;
 			for (integer d = 0; d != NDIM; ++d) {
 				dX[d] = c->Xcom[d] - Xcom[d];
 			}
@@ -461,7 +454,7 @@ void tree::direct_interaction_at(const space_vector<real> &X, real &phi, space_v
 	}
 	if (is_leaf) {
 		real r2, rinv, r3inv;
-		space_vector < real > dX;
+		space_vector<real> dX;
 		for (auto m = particles.begin(); m != particles.end(); ++m) {
 			r2 = zero;
 			for (integer d = 0; d != NDIM; ++d) {
@@ -563,7 +556,7 @@ real tree::compute_error(const tree &root, bool torque) {
 	}
 	if (counter < ncells) {
 		printf("%.2f\r", 100.0 * counter / real(ncells));
-		fflush (stdout);
+		fflush(stdout);
 		++counter;
 		if (counter == ncells) {
 			analytic_computed = true;
@@ -577,7 +570,7 @@ real tree::compute_error(const tree &root, bool torque) {
 
 void tree::initialize() {
 	srand(1234);
-	std::vector < particle > these_parts;
+	std::vector<particle> these_parts;
 	auto dfunc = [](real x) {
 		if (x == zero) {
 			return real(one);
@@ -656,7 +649,7 @@ integer tree::create_tree(const space_vector<real> &xmin, const space_vector<rea
 	is_leaf = true;
 	Xmin = xmin;
 	space_vector<real> this_xmax, this_xmin;
-	std::vector < particle > these_parts;
+	std::vector<particle> these_parts;
 	std::array<std::array<std::array<std::vector<particle>, 2>, 2>, 2> child_parts;
 	particles = std::move(parts);
 	if (particles.size() > ncrit) {
@@ -688,7 +681,7 @@ integer tree::create_tree(const space_vector<real> &xmin, const space_vector<rea
 		}
 	}
 	//	printf( "%i\n", maxlev);
-	particles = std::vector < particle > (particles.begin(), particles.end());
+	particles = std::vector<particle>(particles.begin(), particles.end());
 	return maxlev;
 }
 
@@ -712,5 +705,54 @@ real tree::solve() {
 	real t1 = clock();
 	real total_time = (t1 - t00) / real(CLOCKS_PER_SEC);
 	return total_time;
+}
+
+void tree::save_analytic() {
+	if (is_leaf) {
+		FILE *fp = fopen("analytic.bin", "ab");
+		std::size_t count = particles.end() - particles.begin();
+		fwrite(&count, sizeof(count), 1, fp);
+		for (auto i = particles.begin(); i != particles.end(); i++) {
+			fwrite((&i->phi_analytic), sizeof(real), 1, fp);
+			fwrite(&(i->g_analytic), sizeof(space_vector<real> ), 1, fp);
+		}
+		fclose(fp);
+	} else {
+		for (int ci = 0; ci < nchild; ci++) {
+			children[ci]->save_analytic();
+		}
+	}
+}
+
+bool tree::load_analytic(FILE *fp) {
+	if (fp == NULL) {
+		fp = fopen("analytic.bin", "rb");
+		if (!fp) {
+			return false;
+		}
+	}
+	int read_cnt = 0;
+	if (is_leaf) {
+		std::size_t count;
+		read_cnt += fread(&count, sizeof(count), 1, fp);
+		particles.resize(count);
+		for (auto i = particles.begin(); i != particles.end(); i++) {
+			read_cnt += fread((&i->phi_analytic), sizeof(real), 1, fp);
+			read_cnt += fread(&(i->g_analytic), sizeof(space_vector<real> ), 1, fp);
+		}
+		if (read_cnt == 0) {
+			printf("unexpected end of file\n");
+			abort();
+		}
+	} else {
+		for (int ci = 0; ci < nchild; ci++) {
+			children[ci]->load_analytic(fp);
+		}
+	}
+	analytic_computed = true;
+	if (level == 0) {
+		return true;
+	}
+	return true;
 }
 

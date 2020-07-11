@@ -32,7 +32,7 @@ using integer = long long;
 
 constexpr integer NDIM = 3;
 constexpr integer ncrit = 25;
-constexpr integer nparts = 100000;
+constexpr integer nparts = 10000;
 constexpr integer nchild = 8;
 constexpr integer LP = 20;
 
